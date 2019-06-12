@@ -1,13 +1,33 @@
 package fastlane;
 
-public abstract class MasterTransaction {
+public abstract class MasterTransaction implements Runnable, Transaction {
 	
-	private Framework framework;
+	private Framework f;
 	
-	public MasterTransaction (Framework f) {
-		framework = f;
+	public MasterTransaction (Framework fw) {
+		f = fw;
 	}
 	
-	public abstract void doTransaction();
-
+	public int read(int i) {
+		return f.getData(i);
+	}
+	
+	public void write(int i, int n) {
+		if (f.getCounter() % 2 == 0) {
+			f.incrementCounter();
+		}
+		f.setDirty(i, f.getCounter());
+		f.setData(i, n);
+	}
+	
+	public void commit() {
+		if (f.getCounter() % 2 == 1) {
+			f.incrementCounter();
+		}
+		f.unlockMaster();
+	}
+	
+	public void run() {
+		doTransaction();
+	}
 }

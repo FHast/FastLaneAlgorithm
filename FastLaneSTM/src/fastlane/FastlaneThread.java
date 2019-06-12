@@ -1,30 +1,39 @@
 package fastlane;
 
 public abstract class FastlaneThread extends Thread {
-	private Framework framework;
 	
-	public FastlaneThread(Framework f) {
-		framework = f;
+	private Framework f;
+	
+	public FastlaneThread(Framework fw) {
+		f = fw;
 	}
 	
-	public void startTransaction(boolean pessimistic) {
-		if (framework.getMasterID() == this.getId()) {
-			framework.lockMaster();
-			if (framework.getMasterID() == this.getId()) {
-				
+	public void startExecution(boolean pessimistic) {
+		if (f.getMasterID() == this.getId()) {
+			f.lockMaster();
+			if (f.getMasterID() == this.getId()) {
+			} else {
+				f.unlockMaster();
+				// goto helper codepath
+				new Thread(f.getHelpersCP().get(0)).start();
+				f.getHelpersCP().remove(0);
 			}
 		} else if (pessimistic) {
-			framework.lockMaster();
-			
+			f.lockMaster();
+			f.setMasterID(this.getId());
+			// goto master codepath
+			new Thread(f.getMasterCP().get(0)).start();
+			f.getMasterCP().remove(0);
 		} else {
-			
+			// goto helper codepath
+			new Thread(f.getHelpersCP().get(0)).start();
+			f.getHelpersCP().remove(0);
 		}
 	}
 	
 	public void run() {
-		
+		while (!f.getMasterCP().isEmpty() || !f.getHelpersCP().isEmpty()) {
+			startExecution(true);
+		}	
 	}
-	
-	protected abstract void doMasterCP();
-	protected abstract void doHelperCP();
 }

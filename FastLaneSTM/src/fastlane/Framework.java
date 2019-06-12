@@ -1,5 +1,6 @@
 package fastlane;
 
+import java.util.ArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Framework {
@@ -8,7 +9,13 @@ public class Framework {
 	private int[] data;
 	private ReentrantLock master;
 	private ReentrantLock helpers;
-	private int masterID = 0;
+	private long masterID = 0;
+	
+	private ArrayList<MasterTransaction> masterCP = new ArrayList<>();
+	private ArrayList<HelpersTransaction> helpersCP = new ArrayList<>();
+	
+	private int currentMasterCtx = 0;
+	private int currentHelpersCtx = 0;
 	
 	public Framework(int memSize) {
 		dirty = new int[memSize];
@@ -23,6 +30,10 @@ public class Framework {
 	
 	public void setCounter(int i) {
 		cntr = i;
+	}
+	
+	public void incrementCounter() {
+		cntr++;
 	}
 	
 	public int getDirty(int i) {
@@ -61,12 +72,27 @@ public class Framework {
 		helpers.unlock();
 	}
 	
-	public int getMasterID() {
+	public long getMasterID() {
 		return masterID;
 	}
 	
-	public void setMasterID(int id) {
+	public void setMasterID(long id) {
 		masterID = id;
 	}
+	
+	public ArrayList<MasterTransaction> getMasterCP() {
+		return masterCP;
+	}
+	
+	public ArrayList<HelpersTransaction> getHelpersCP() {
+		return helpersCP;
+	}
 
+	public int getCurrentMasterCtx() {
+		return currentMasterCtx;
+	}
+	
+	public int getCurrentHelpersCtx() {
+		return currentHelpersCtx;
+	}
 }
