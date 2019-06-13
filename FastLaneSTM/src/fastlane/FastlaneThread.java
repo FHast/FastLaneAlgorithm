@@ -8,6 +8,10 @@ public class FastlaneThread extends Thread {
 		f = fw;
 	}
 	
+	public long getID() {
+		return this.getId();
+	}
+	
 	public void startExecution(boolean pessimistic) {
 		if (f.getMasterID() == this.getId()) {
 			f.lockMaster();

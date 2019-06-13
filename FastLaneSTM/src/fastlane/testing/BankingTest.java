@@ -49,6 +49,8 @@ class BankingTest {
 		FastlaneThread t1 = new FastlaneThread(fw);
 		FastlaneThread t2 = new FastlaneThread(fw);
 		
+		fw.setMasterID(t1.getID());
+		
 		t1.start();
 		t2.start();
 		
