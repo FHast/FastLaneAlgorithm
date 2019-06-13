@@ -14,7 +14,8 @@ public class Framework {
 	private ArrayList<MasterTransaction> masterCP = new ArrayList<>();
 	private ArrayList<HelpersTransaction> helpersCP = new ArrayList<>();
 	
-	private ReentrantLock cpLock;
+	private ReentrantLock masterCPLock;
+	private ReentrantLock helpersCPLock;
 
 	private int currentMasterCtx = 0;
 	private int currentHelpersCtx = 0;
@@ -24,7 +25,8 @@ public class Framework {
 		data = new int[memSize];
 		master = new ReentrantLock();
 		helpers = new ReentrantLock();
-		cpLock = new ReentrantLock();
+		masterCPLock = new ReentrantLock();
+		helpersCPLock = new ReentrantLock();
 	}
 
 	public int getCounter() {
@@ -84,27 +86,32 @@ public class Framework {
 	}
 
 	public synchronized MasterTransaction getMasterCP() {
+		masterCPLock.lock();
 		if (masterCP.isEmpty()) {
+			masterCPLock.unlock();
 			return null;
 		} else {
 			MasterTransaction t = masterCP.get(0);
 			masterCP.remove(0);
+			masterCPLock.unlock();
 			return t;
 		}
 	}
 
 	public synchronized HelpersTransaction getHelpersCP() {
+		helpersCPLock.lock();
 		if (helpersCP.isEmpty()) {
+			helpersCPLock.unlock();
 			return null;
 		} else {
 			HelpersTransaction t = helpersCP.get(0);
 			helpersCP.remove(0);
+			helpersCPLock.unlock();
 			return t;
 		}
 	}
 
 	public boolean isTransactionAvailable() {
-		cpLock.lock();
 		return !masterCP.isEmpty() && !helpersCP.isEmpty();
 	}
 	
@@ -114,10 +121,6 @@ public class Framework {
 	
 	public int countHelpersCP() {
 		return helpersCP.size();
-	}
-
-	public void unlockCP() {
-		cpLock.unlock();
 	}
 	
 	public void addTransaction(Transaction t) {

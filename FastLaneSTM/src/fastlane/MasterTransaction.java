@@ -28,7 +28,7 @@ public abstract class MasterTransaction implements Transaction {
 		}
 		f.unlockMaster();
 		try {
-			Thread.sleep(50);
+			Thread.sleep(1000);
 		} catch (InterruptedException e) {
 		}
 	}

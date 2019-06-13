@@ -21,7 +21,6 @@ public class FastlaneThread extends Thread {
 			if (f.getMasterID() == tid) {
 				// goto master codepath
 				MasterTransaction t = f.getMasterCP();
-				f.unlockCP();
 				if (t != null) {
 					t.run();
 				} else {
@@ -33,7 +32,6 @@ public class FastlaneThread extends Thread {
 				System.out.println("helper");
 				// goto helper codepath
 				HelpersTransaction t = f.getHelpersCP();
-				f.unlockCP();
 				if (t != null) {
 					t.run();
 				} else {
@@ -46,7 +44,6 @@ public class FastlaneThread extends Thread {
 			f.setMasterID(tid);
 			// goto master codepath
 			MasterTransaction t = f.getMasterCP();
-			f.unlockCP();
 			if (t != null) {
 				t.run();
 			} else {
@@ -57,7 +54,6 @@ public class FastlaneThread extends Thread {
 			System.out.println("helper2");
 			// goto helper codepath
 			HelpersTransaction t = f.getHelpersCP();
-			f.unlockCP();
 			if (t != null) {
 				t.run();
 			} else {
@@ -70,9 +66,10 @@ public class FastlaneThread extends Thread {
 		System.out.println("Start thread " + tid);
 		System.out.println("mastercp no. = " + f.countMasterCP());
 		System.out.println("helperscp no. = " + f.countHelpersCP());
-		System.out.println("transaction available: " + f.isTransactionAvailable());
-		while (f.isTransactionAvailable()) {
-			startExecution(true);
+		//System.out.println("transaction available: " + f.isTransactionAvailable());
+		
+		while(f.isTransactionAvailable()) {
+			startExecution(false);
 		}
 	}
 }

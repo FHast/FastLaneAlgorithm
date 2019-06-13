@@ -21,32 +21,35 @@ class BankingTest {
 		fw.addTransaction(new MasterTransaction(fw) {
 			@Override
 			public void doTransaction() {
-				System.out.println("master");
+				System.out.println("master1 starts");
 				for(int i = 0; i != 3; i++) {
 					write(i,5000);
 				}
 				commit();
+				System.out.println("master1 done");
 			}
 		});
 
 		fw.addTransaction(new MasterTransaction(fw) {
 			@Override
 			public void doTransaction() {
-				System.out.println("master2");
+				System.out.println("master2 starts");
 				int i = read(1);
 				int j = read(2);
 				write(1, i + j);
 				write(2, 0);
 				commit();
+				System.out.println("master2 done");
 			}
 		});
 		
 		fw.addTransaction(new MasterTransaction(fw) {
 			@Override
 			public void doTransaction() {
-				System.out.println("master3");
+				System.out.println("master3 done");
 				write(2, 0);
 				commit();
+				System.out.println("master3 done");
 			}
 		});
 		
