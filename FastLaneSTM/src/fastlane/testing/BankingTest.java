@@ -21,10 +21,12 @@ class BankingTest {
 		fw.addTransaction(new MasterTransaction(fw) {
 			@Override
 			public void doTransaction() {
+				System.out.println("master");
 				int i = read(1);
 				int j = read(2);
 				write(1, i + j);
 				write(2, i - j);
+				commit();
 			}
 		});
 
@@ -34,6 +36,7 @@ class BankingTest {
 			public void doTransaction() {
 				int i = read(1);
 				write(1,i+40000);
+				commit();
 			}
 		});
 		
@@ -41,15 +44,17 @@ class BankingTest {
 
 			@Override
 			public void doTransaction() {
+				System.out.println("second helper");
 				write(0,0);
+				commit();
 			}
 			
 		});
 		
-		FastlaneThread t1 = new FastlaneThread(fw);
-		FastlaneThread t2 = new FastlaneThread(fw);
+		FastlaneThread t1 = new FastlaneThread(fw,1);
+		FastlaneThread t2 = new FastlaneThread(fw,2);
 		
-		fw.setMasterID(t1.getID());
+		fw.setMasterID(1);
 		
 		t1.start();
 		t2.start();
@@ -61,9 +66,9 @@ class BankingTest {
 			e.printStackTrace();
 		}
 		
-		assertEquals(fw.getData(0),0);
-		
-		
+		System.out.println("data0 = " + fw.getData(0));
+		System.out.println("data1 = " + fw.getData(1));
+		System.out.println("data2 = " + fw.getData(2));
 		
 	}
 

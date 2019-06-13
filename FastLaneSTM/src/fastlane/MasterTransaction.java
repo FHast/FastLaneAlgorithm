@@ -9,10 +9,12 @@ public abstract class MasterTransaction implements Runnable, Transaction {
 	}
 	
 	public int read(int i) {
+		System.out.println("master read");
 		return f.getData(i);
 	}
 	
 	public void write(int i, int n) {
+		System.out.println("master writes");
 		if (f.getCounter() % 2 == 0) {
 			f.incrementCounter();
 		}

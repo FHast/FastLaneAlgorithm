@@ -21,7 +21,6 @@ public abstract class HelpersTransaction implements Runnable, Transaction {
 	
 	public void run() {
 		while(true) {
-			System.out.println(System.currentTimeMillis());
 			start();
 			doTransaction();
 			if (aborted) {
