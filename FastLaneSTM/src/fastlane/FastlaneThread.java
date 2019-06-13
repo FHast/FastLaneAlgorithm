@@ -17,11 +17,11 @@ public class FastlaneThread extends Thread {
 	public void startExecution(boolean pessimistic) {
 		if (f.getMasterID() == tid) {
 			f.lockMaster();
-			if (f.getMasterID() == this.getId()) {
+			if (f.getMasterID() == tid) {
 				// goto master codepath
-				if (!f.getMasterCP().isEmpty()) {
-					new Thread(f.getMasterCP().get(0)).start();
-					f.getMasterCP().remove(0);
+					MasterTransaction t = f.getMasterCP();
+					if (t != null) {
+						t.run();
 				} else {
 					f.unlockMaster();
 					return;
@@ -29,29 +29,29 @@ public class FastlaneThread extends Thread {
 			} else {
 				f.unlockMaster();
 				// goto helper codepath
-				if (!f.getHelpersCP().isEmpty()) {
-					new Thread(f.getHelpersCP().get(0)).start();
-					f.getHelpersCP().remove(0);
+					HelpersTransaction t = f.getHelpersCP();
+					if (t != null) {
+						t.run();
 				} else {
 					return;
 				}
 			}
 		} else if (pessimistic) {
 			f.lockMaster();
-			f.setMasterID(this.getId());
+			f.setMasterID(tid);
 			// goto master codepath
-			if (!f.getMasterCP().isEmpty()) {
-				new Thread(f.getMasterCP().get(0)).start();
-				f.getMasterCP().remove(0);
+			MasterTransaction t = f.getMasterCP();
+			if (t != null) {
+				t.run();
 			} else {
 				f.unlockMaster();
 				return;
 			}
 		} else {
 			// goto helper codepath
-			if (!f.getHelpersCP().isEmpty()) {
-			new Thread(f.getHelpersCP().get(0)).start();
-			f.getHelpersCP().remove(0);
+				HelpersTransaction t = f.getHelpersCP();
+				if (t != null) {
+					t.run();
 			} else {
 				return;
 			}
@@ -60,7 +60,7 @@ public class FastlaneThread extends Thread {
 
 	public void run() {
 
-		while (!f.getMasterCP().isEmpty() && !f.getHelpersCP().isEmpty()) {
+		while (f.isTransactionAvailable()) {
 			startExecution(true);
 		}
 	}

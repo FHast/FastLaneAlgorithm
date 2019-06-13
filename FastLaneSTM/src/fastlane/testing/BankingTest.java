@@ -26,7 +26,7 @@ class BankingTest {
 				int j = read(2);
 				write(1, i + j);
 				write(2, i - j);
-				commit();
+				//commit();
 			}
 		});
 

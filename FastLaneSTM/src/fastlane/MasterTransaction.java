@@ -1,6 +1,6 @@
 package fastlane;
 
-public abstract class MasterTransaction implements Runnable, Transaction {
+public abstract class MasterTransaction implements Transaction {
 	
 	private Framework f;
 	

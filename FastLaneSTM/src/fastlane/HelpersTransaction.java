@@ -3,7 +3,7 @@ package fastlane;
 import java.util.HashMap;
 import java.util.HashSet;
 
-public abstract class HelpersTransaction implements Runnable, Transaction {
+public abstract class HelpersTransaction implements Transaction {
 
 	private Framework f;
 	protected int start = 0;
@@ -41,6 +41,7 @@ public abstract class HelpersTransaction implements Runnable, Transaction {
 	
 	public int read(int i) {
 		if (aborted) return -1;
+		System.out.println("helper reads");
 		
 		if (writeSet.containsKey(i)) {
 			return writeSet.get(i);
@@ -55,6 +56,7 @@ public abstract class HelpersTransaction implements Runnable, Transaction {
 	}
 	
 	public void write(int i, int n) {
+		System.out.println("helper writes");
 		if (aborted) return;
 		
 		if (f.getDirty(i) > start) {
@@ -94,7 +96,8 @@ public abstract class HelpersTransaction implements Runnable, Transaction {
 		if (!validate()) {
 			f.unlockMaster();
 			f.unlockHelpers();
-			
+			abort();
+			return;
 		}
 		
 		f.incrementCounter();
