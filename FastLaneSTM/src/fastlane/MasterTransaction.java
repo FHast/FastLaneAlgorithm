@@ -27,6 +27,10 @@ public abstract class MasterTransaction implements Transaction {
 			f.incrementCounter();
 		}
 		f.unlockMaster();
+		try {
+			Thread.sleep(50);
+		} catch (InterruptedException e) {
+		}
 	}
 	
 	public void run() {

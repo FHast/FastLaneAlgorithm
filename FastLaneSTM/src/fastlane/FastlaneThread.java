@@ -15,32 +15,38 @@ public class FastlaneThread extends Thread {
 	}
 
 	public void startExecution(boolean pessimistic) {
+		System.out.println("Master " + f.getMasterID() + ", Self " + tid);
 		if (f.getMasterID() == tid) {
 			f.lockMaster();
 			if (f.getMasterID() == tid) {
 				// goto master codepath
-					MasterTransaction t = f.getMasterCP();
-					if (t != null) {
-						t.run();
+				MasterTransaction t = f.getMasterCP();
+				f.unlockCP();
+				if (t != null) {
+					t.run();
 				} else {
 					f.unlockMaster();
 					return;
 				}
 			} else {
 				f.unlockMaster();
+				System.out.println("helper");
 				// goto helper codepath
-					HelpersTransaction t = f.getHelpersCP();
-					if (t != null) {
-						t.run();
+				HelpersTransaction t = f.getHelpersCP();
+				f.unlockCP();
+				if (t != null) {
+					t.run();
 				} else {
 					return;
 				}
 			}
 		} else if (pessimistic) {
+			System.out.println("pessimistic");
 			f.lockMaster();
 			f.setMasterID(tid);
 			// goto master codepath
 			MasterTransaction t = f.getMasterCP();
+			f.unlockCP();
 			if (t != null) {
 				t.run();
 			} else {
@@ -48,10 +54,12 @@ public class FastlaneThread extends Thread {
 				return;
 			}
 		} else {
+			System.out.println("helper2");
 			// goto helper codepath
-				HelpersTransaction t = f.getHelpersCP();
-				if (t != null) {
-					t.run();
+			HelpersTransaction t = f.getHelpersCP();
+			f.unlockCP();
+			if (t != null) {
+				t.run();
 			} else {
 				return;
 			}
@@ -59,7 +67,10 @@ public class FastlaneThread extends Thread {
 	}
 
 	public void run() {
-
+		System.out.println("Start thread " + tid);
+		System.out.println("mastercp no. = " + f.countMasterCP());
+		System.out.println("helperscp no. = " + f.countHelpersCP());
+		System.out.println("transaction available: " + f.isTransactionAvailable());
 		while (f.isTransactionAvailable()) {
 			startExecution(true);
 		}

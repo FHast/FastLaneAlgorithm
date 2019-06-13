@@ -22,14 +22,34 @@ class BankingTest {
 			@Override
 			public void doTransaction() {
 				System.out.println("master");
-				int i = read(1);
-				int j = read(2);
-				write(1, i + j);
-				write(2, i - j);
-				//commit();
+				for(int i = 0; i != 3; i++) {
+					write(i,5000);
+				}
+				commit();
 			}
 		});
 
+		fw.addTransaction(new MasterTransaction(fw) {
+			@Override
+			public void doTransaction() {
+				System.out.println("master2");
+				int i = read(1);
+				int j = read(2);
+				write(1, i + j);
+				write(2, 0);
+				commit();
+			}
+		});
+		
+		fw.addTransaction(new MasterTransaction(fw) {
+			@Override
+			public void doTransaction() {
+				System.out.println("master3");
+				write(2, 0);
+				commit();
+			}
+		});
+		
 		// set helpers CP
 		fw.addTransaction(new HelpersTransaction(fw) {
 			@Override
@@ -44,7 +64,6 @@ class BankingTest {
 
 			@Override
 			public void doTransaction() {
-				System.out.println("second helper");
 				write(0,0);
 				commit();
 			}
@@ -53,15 +72,18 @@ class BankingTest {
 		
 		FastlaneThread t1 = new FastlaneThread(fw,1);
 		FastlaneThread t2 = new FastlaneThread(fw,2);
+		FastlaneThread t3 = new FastlaneThread(fw,3);
 		
 		fw.setMasterID(1);
 		
 		t1.start();
 		t2.start();
+		t3.start();
 		
 		try {
 			t1.join();
 			t2.join();
+			t3.join();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
