@@ -87,6 +87,14 @@ public class Framework {
 	public ArrayList<HelpersTransaction> getHelpersCP() {
 		return helpersCP;
 	}
+	
+	public void addTransaction(Transaction t) {
+		if (t instanceof MasterTransaction) {
+			masterCP.add((MasterTransaction) t);
+		} else if (t instanceof HelpersTransaction) {
+			helpersCP.add((HelpersTransaction) t);
+		}
+	}
 
 	public int getCurrentMasterCtx() {
 		return currentMasterCtx;

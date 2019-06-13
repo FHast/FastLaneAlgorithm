@@ -1,6 +1,6 @@
 package fastlane;
 
-public abstract class FastlaneThread extends Thread {
+public class FastlaneThread extends Thread {
 	
 	private Framework f;
 	
